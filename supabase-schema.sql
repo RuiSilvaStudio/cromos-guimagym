@@ -9,6 +9,7 @@ CREATE TABLE users (
   username TEXT NOT NULL,
   email TEXT NOT NULL,
   avatar TEXT DEFAULT '01',
+  location TEXT DEFAULT 'Academia',
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -65,8 +66,9 @@ CREATE POLICY "Trade requests viewable by involved parties" ON trade_requests
   FOR SELECT USING (auth.uid() = from_user_id OR auth.uid() = to_user_id);
 CREATE POLICY "Users can create trade requests" ON trade_requests
   FOR INSERT WITH CHECK (auth.uid() = from_user_id);
-CREATE POLICY "Receiver can update trade status" ON trade_requests
-  FOR UPDATE USING (auth.uid() = to_user_id);
+-- Both sender and receiver can update the trade request (accept, complete, decline)
+CREATE POLICY "Involved users can update trade requests" ON trade_requests
+  FOR UPDATE USING (auth.uid() = to_user_id OR auth.uid() = from_user_id);
 CREATE POLICY "Sender can delete own trade requests" ON trade_requests
   FOR DELETE USING (auth.uid() = from_user_id);
 

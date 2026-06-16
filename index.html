@@ -6,9 +6,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0D0D1A">
-  <title>GuimaGym - Caderneta de Stickers</title>
+  <title>GuimaGym - Caderneta de Stickers 2026</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +27,7 @@
       --gold-dim: #D4A830;
       --text-primary: #F5F0EB;
       --text-secondary: #9B96A8;
-      --text-muted: #5C5872;
+      --text-muted: #7A7690;
       --border: rgba(255, 255, 255, 0.06);
       --border-accent: rgba(0, 212, 170, 0.3);
       --radius-sm: 8px;
@@ -197,7 +198,6 @@
     }
 
     .btn {
-      width: 100%;
       padding: 14px;
       border: none;
       border-radius: var(--radius-md);
@@ -208,6 +208,8 @@
       transition: transform var(--transition-fast), box-shadow var(--transition-fast);
       letter-spacing: 0.3px;
     }
+
+    .btn-full { width: 100%; }
 
     .btn:active { transform: scale(0.98); }
     .btn-primary {
@@ -268,26 +270,218 @@
     .app-header .brand {
       display: flex;
       align-items: center;
-      gap: var(--space-sm);
+      gap: var(--space-md);
     }
 
     .app-header .brand-icon {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, var(--accent), var(--gold));
-      border-radius: 9px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .app-header .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
     }
 
     .app-header h2 {
       font-family: var(--font-display);
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: -0.3px;
+      line-height: 1.2;
     }
+
+    .app-header .brand-icon img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .header-location {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .community-stats {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .community-stats .greeting {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: var(--space-md);
+    }
+
+    .community-stats .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+    }
+
+    .rare-section {
+      margin-bottom: var(--space-lg);
+    }
+
+    .rare-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-sm);
+    }
+
+    .rare-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-xs);
+      text-align: center;
+      transition: border-color var(--transition-fast);
+    }
+
+    .rare-item:hover {
+      border-color: var(--border-accent);
+    }
+
+    .rare-item .rare-id {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .rare-item .rare-count {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .match-location {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .scanner-btn {
+      padding: 10px 16px;
+      background: var(--bg-surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scanner-btn:hover { border-color: var(--border-accent); color: var(--text-primary); }
+
+    .scanner-result {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-top: var(--space-md);
+      text-align: center;
+    }
+
+    .scanner-result .found-number {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent);
+      margin: var(--space-md) 0;
+    }
+
+    .scanner-result .scanner-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+
+    .scanner-result .scanner-actions button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+    }
+
+    .scanner-actions button:active { transform: scale(0.97); }
+
+    .btn-add {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+      color: var(--bg-deep);
+    }
+
+    .btn-dup {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+      color: var(--bg-deep);
+    }
+
+    .btn-fallback {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .scanner-progress {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .location-select {
+      width: 100%;
+      padding: 14px var(--space-md);
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239B96A8'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 30px;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .location-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .location-select option { background: var(--bg-deep); color: var(--text-primary); }
 
     .logout-btn {
       background: var(--bg-elevated);
@@ -332,7 +526,7 @@
       align-items: center;
       gap: 3px;
       color: var(--text-muted);
-      font-size: 10px;
+      font-size: 11px;
       font-family: var(--font-body);
       font-weight: 500;
       transition: color var(--transition-fast);
@@ -452,7 +646,12 @@
     .filter-bar select option { background: var(--bg-surface); color: var(--text-primary); }
 
     /* Profile actions */
-    .profile-actions { margin-top: var(--space-lg); }
+    .profile-actions { margin-top: var(--space-xl); }
+    .profile-actions-danger {
+      margin-top: var(--space-xl);
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--border);
+    }
     .profile-action-btn {
       width: 100%;
       padding: 14px;
@@ -677,13 +876,15 @@
       transition: opacity var(--transition-fast);
     }
 
-    .match-card:hover {
-      border-color: var(--border-accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }
+    @media (hover: hover) and (pointer: fine) {
+      .match-card:hover {
+        border-color: var(--border-accent);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      }
 
-    .match-card:hover::before { opacity: 1; }
+      .match-card:hover::before { opacity: 1; }
+    }
 
     .match-header {
       display: flex;
@@ -974,7 +1175,7 @@
     }
 
     .sticker-cell .count {
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 500;
       margin-top: 1px;
       opacity: 0.7;
@@ -1003,7 +1204,7 @@
       border-radius: var(--radius-xl);
       padding: var(--space-xl);
       width: 100%;
-      max-width: 340px;
+      max-width: 380px;
       animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
@@ -1155,10 +1356,11 @@
       color: var(--bg-deep);
     }
     .btn-decline {
-      background: var(--bg-elevated);
-      color: var(--text-secondary);
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
     }
-    .btn-decline:hover { color: #FF5252; }
+    .btn-decline:hover { color: #FF5252; border-color: rgba(255,82,82,0.3); }
 
     .contact-reveal {
       margin-top: var(--space-md);
@@ -1383,12 +1585,14 @@
     @media (min-width: 600px) {
       .sticker-grid { grid-template-columns: repeat(10, 1fr); }
       .auth-container { padding: var(--space-2xl); }
+      .rare-grid { grid-template-columns: repeat(10, 1fr); }
     }
 
     @media (max-width: 380px) {
       .sticker-grid { grid-template-columns: repeat(5, 1fr); }
       .stats-grid { gap: var(--space-sm); }
       .stat-num { font-size: 22px; }
+      .rare-grid { grid-template-columns: repeat(5, 1fr); }
     }
   </style>
 </head>
@@ -1401,7 +1605,7 @@
     <div class="auth-logo">
       <div class="auth-logo-icon">🏆</div>
       <h1>GuimaGym</h1>
-      <p>Caderneta de Stickers</p>
+      <p>Caderneta de Stickers 2026</p>
     </div>
     <div id="auth-error" class="error-msg hidden"></div>
 
@@ -1415,7 +1619,7 @@
         <label for="login-password">Password</label>
         <input type="password" id="login-password" placeholder="A sua password" autocomplete="current-password">
       </div>
-      <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">Entrar</button>
+      <button class="btn btn-primary btn-full" id="login-btn" onclick="handleLogin()">Entrar</button>
       <div class="auth-extras">
         <a onclick="showForgotPassword()">Esqueceu a password?</a>
         <a onclick="showRegister()">Nao tem conta? Registar agora</a>
@@ -1433,6 +1637,13 @@
         <input type="email" id="reg-email" placeholder="seu@email.com" autocomplete="email">
       </div>
       <div class="form-group">
+        <label for="reg-location">Localizacao</label>
+        <select id="reg-location" class="location-select">
+          <option value="Academia">Academia</option>
+          <option value="Urgeses">Urgeses</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="reg-password">Password</label>
         <input type="password" id="reg-password" placeholder="Minimo 6 caracteres" autocomplete="new-password">
       </div>
@@ -1440,7 +1651,7 @@
         <label for="reg-confirm">Confirmar Password</label>
         <input type="password" id="reg-confirm" placeholder="Repita a password" autocomplete="new-password">
       </div>
-      <button class="btn btn-primary" id="reg-btn" onclick="handleRegister()">Registar</button>
+      <button class="btn btn-primary btn-full" id="reg-btn" onclick="handleRegister()">Registar</button>
       <div class="auth-link">
         <a onclick="showLogin()">Ja tem conta? Voltar ao login</a>
       </div>
@@ -1452,7 +1663,7 @@
         <label for="forgot-email">Email</label>
         <input type="email" id="forgot-email" placeholder="seu@email.com" autocomplete="email">
       </div>
-      <button class="btn btn-primary" onclick="handleForgotPassword()">Enviar link de recuperacao</button>
+      <button class="btn btn-primary btn-full" onclick="handleForgotPassword()">Enviar link de recuperacao</button>
       <div class="auth-link">
         <a onclick="showLogin()">Voltar ao login</a>
       </div>
@@ -1460,7 +1671,7 @@
 
     <!-- Reset Password Form -->
     <div id="reset-form" class="hidden">
-      <p style="color:var(--muted);margin-bottom:1rem;font-size:0.9rem;">Introduza a sua nova password:</p>
+      <p style="color:var(--text-muted);margin-bottom:var(--space-md);font-size:14px;">Introduza a sua nova password:</p>
       <div class="form-group">
         <label for="reset-password">Nova Password</label>
         <input type="password" id="reset-password" placeholder="Minimo 6 caracteres" autocomplete="new-password">
@@ -1469,7 +1680,7 @@
         <label for="reset-confirm">Confirmar Password</label>
         <input type="password" id="reset-confirm" placeholder="Repita a password" autocomplete="new-password">
       </div>
-      <button class="btn btn-primary" onclick="handleResetPassword()">Guardar nova password</button>
+      <button class="btn btn-primary btn-full" onclick="handleResetPassword()">Guardar nova password</button>
     </div>
   </div>
 </div>
@@ -1478,8 +1689,11 @@
 <div id="app" class="app hidden">
   <header class="app-header">
     <div class="brand">
-      <div class="brand-icon" aria-hidden="true">🏆</div>
-      <h2>GuimaGym</h2>
+      <div id="header-avatar" class="brand-icon" aria-hidden="true">🏆</div>
+      <div class="brand-text">
+        <h2 id="header-username">GuimaGym</h2>
+        <span id="header-location" class="header-location"></span>
+      </div>
     </div>
     <button class="logout-btn" onclick="handleLogout()">Sair</button>
   </header>
@@ -1490,7 +1704,7 @@
   <div id="page-dashboard" class="page hidden">
     <div class="hero-stats">
       <div class="greeting">A sua colecao</div>
-      <h3>Caderneta de Stickers</h3>
+      <h3>Caderneta de Stickers 2026</h3>
       <div class="progress-wrapper">
         <div class="progress-bar"><div id="progress-fill" class="progress-fill" style="width:0%"></div></div>
         <p id="progress-text" class="progress-text"><strong>0%</strong> completo</p>
@@ -1500,6 +1714,21 @@
         <div class="stat-item"><div id="stat-tradeable" class="stat-num">0</div><div class="stat-label">Para Trocar</div></div>
         <div class="stat-item"><div class="stat-num">788</div><div class="stat-label">Total</div></div>
       </div>
+    </div>
+
+    <div class="community-stats">
+      <div class="greeting">Comunidade</div>
+      <div class="stats-grid">
+        <div class="stat-item"><div id="stat-total-users" class="stat-num">-</div><div class="stat-label">Utilizadores</div></div>
+        <div class="stat-item"><div id="stat-avg-completion" class="stat-num">-</div><div class="stat-label">Media de Conclusao</div></div>
+      </div>
+    </div>
+
+    <div class="rare-section">
+      <div class="section-header">
+        <h3>Figurinhas Mais Raras</h3>
+      </div>
+      <div id="rare-list" class="rare-grid"></div>
     </div>
 
     <div class="section-header">
@@ -1523,6 +1752,7 @@
     </div>
     <div class="quick-bar">
       <button id="quick-mark-btn" class="quick-mark-btn" onclick="toggleQuickMark()">&#9889; Modo Rapido</button>
+      <button class="scanner-btn" onclick="openScanner()">&#128247; Escanear</button>
     </div>
     <div class="import-section" id="import-section">
       <div class="import-header" onclick="this.parentElement.classList.toggle('open')">
@@ -1537,7 +1767,7 @@
           </div>
           <textarea id="import-input" class="import-textarea" placeholder="Ex: 001-100, 150, 200-300, 445" oninput="previewImport()"></textarea>
           <div id="import-preview" class="import-preview"></div>
-          <button class="btn btn-primary" onclick="executeImport()">Importar</button>
+          <button class="btn btn-primary btn-full" onclick="executeImport()">Importar</button>
         </div>
       </div>
     </div>
@@ -1557,16 +1787,17 @@
       <h4>Escolher avatar</h4>
       <div id="avatar-grid" class="avatar-grid"></div>
     </div>
-    <div class="hero-stats">
-      <div class="greeting">Estatisticas</div>
-      <div class="stats-grid" style="margin-top:0">
-        <div class="stat-item"><div id="profile-unique" class="stat-num">0</div><div class="stat-label">Unicas</div></div>
-        <div class="stat-item"><div id="profile-total" class="stat-num">0</div><div class="stat-label">Total</div></div>
-        <div class="stat-item"><div id="profile-tradeable" class="stat-num">0</div><div class="stat-label">Para Trocar</div></div>
-      </div>
+    <div class="form-group" style="margin-top:var(--space-lg)">
+      <label for="profile-location">Localizacao</label>
+      <select id="profile-location" class="location-select" onchange="updateLocation()">
+        <option value="Academia">Academia</option>
+        <option value="Urgeses">Urgeses</option>
+      </select>
     </div>
     <div class="profile-actions">
       <button class="profile-action-btn" onclick="handleLogout()">&#x2190; Sair da Conta</button>
+    </div>
+    <div class="profile-actions-danger">
       <button class="profile-action-btn danger" onclick="handleDeleteAccount()">&#x2717; Eliminar Conta</button>
     </div>
   </div>
@@ -1585,7 +1816,7 @@
       <div id="pedidos-outgoing-list"></div>
     </div>
     <div id="pedidos-history-section" class="request-section" style="display:none">
-      <h4 style="cursor:pointer" onclick="document.getElementById('pedidos-history').classList.toggle('hidden');this.textContent=this.textContent.includes('▼') ? 'Historico ▶' : 'Historico ▼'">Historico ▶</h4>
+      <button class="profile-action-btn" style="background:none;border:none;text-align:left;color:var(--text-secondary);font-size:14px;cursor:pointer;padding:0;margin-bottom:var(--space-sm)" onclick="const el=document.getElementById('pedidos-history');const isOpen=el.classList.toggle('hidden');this.textContent=isOpen?'Historico ▼':'Historico ▶'" aria-expanded="false" aria-controls="pedidos-history">Historico &#9654;</button>
       <div id="pedidos-history" class="hidden"></div>
     </div>
   </div>
@@ -1593,11 +1824,11 @@
   </main>
 
   <!-- TAB BAR -->
-  <nav id="tab-bar" class="tab-bar" aria-label="Navegacao principal">
-    <button class="active" onclick="showPage('dashboard')" aria-label="Inicio"><span class="tab-icon" aria-hidden="true">&#9750;</span>Inicio</button>
-    <button onclick="showPage('collection')" aria-label="Colecao"><span class="tab-icon" aria-hidden="true">&#9733;</span>Colecao</button>
-    <button onclick="showPage('pedidos')" aria-label="Pedidos"><span class="tab-icon" aria-hidden="true">&#9993;</span>Pedidos<span id="notif-dot" class="notif-dot"></span></button>
-    <button onclick="showPage('profile')" aria-label="Perfil"><span class="tab-icon" aria-hidden="true">&#9787;</span>Perfil</button>
+  <nav id="tab-bar" class="tab-bar" aria-label="Navegacao principal" role="tablist">
+    <button class="active" onclick="showPage('dashboard')" aria-label="Inicio" role="tab" aria-selected="true"><span class="tab-icon" aria-hidden="true">&#9750;</span>Inicio</button>
+    <button onclick="showPage('collection')" aria-label="Colecao" role="tab" aria-selected="false"><span class="tab-icon" aria-hidden="true">&#9733;</span>Colecao</button>
+    <button onclick="showPage('pedidos')" aria-label="Pedidos" role="tab" aria-selected="false"><span class="tab-icon" aria-hidden="true">&#9993;</span>Pedidos<span id="notif-dot" class="notif-dot"></span><span id="notif-sr" class="sr-only" aria-live="polite"></span></button>
+    <button onclick="showPage('profile')" aria-label="Perfil" role="tab" aria-selected="false"><span class="tab-icon" aria-hidden="true">&#9787;</span>Perfil</button>
   </nav>
 </div>
 
@@ -1611,7 +1842,7 @@
     </div>
     <div class="form-group" id="trade-group">
       <label for="modal-tradeable">Quantas para trocar?</label>
-      <input type="number" id="modal-tradeable" min="0" value="0">
+      <input type="number" id="modal-tradeable" min="0" max="99" value="0">
     </div>
     <div class="btn-row">
       <button class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
@@ -1650,6 +1881,20 @@
     </div>
   </div>
 </div>
+
+<!-- SCANNER MODAL -->
+<div id="scanner-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeScannerModal()">
+  <div class="modal" role="dialog" aria-labelledby="scanner-title">
+    <h3 id="scanner-title">Escanear figurinha</h3>
+    <div id="scanner-content">
+      <div class="scanner-progress">A abrir camara...</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="closeScannerModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="scanner-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleScannerFile(event)">
 
 <script type="module">
   const SUPABASE_URL = 'https://pcpfxrmcaqkzncjnrrxp.supabase.co';
@@ -1704,6 +1949,7 @@
   window.handleRegister = async () => {
     const username = document.getElementById('reg-username').value;
     const email = document.getElementById('reg-email').value;
+    const location = document.getElementById('reg-location').value;
     const password = document.getElementById('reg-password').value;
     const confirm = document.getElementById('reg-confirm').value;
     if (!username || !email || !password || !confirm) return showError('Preencha todos os campos.');
@@ -1717,7 +1963,7 @@
       const { data, error } = await supa.auth.signUp({ email, password, options: { data: { username } } });
       if (error) throw error;
       if (data.user) {
-        await supa.from('users').insert({ id: data.user.id, username, email });
+        await supa.from('users').insert({ id: data.user.id, username, email, location });
       }
       if (data.session) {
         // Auto-signed in (email confirmation disabled)
@@ -1755,7 +2001,7 @@
     try {
       const { error } = await supa.auth.updateUser({ password });
       if (error) throw error;
-      alert('Password alterada com sucesso! Faca login.');
+      showToast('Password alterada com sucesso! Faca login.', 'success');
       showLogin();
     } catch (e) { showError(e.message); }
   };
@@ -1772,9 +2018,9 @@
       // CASCADE deletes stickers + trade_requests
       await supa.from('users').delete().eq('id', currentUser.id);
       await supa.auth.signOut();
-      alert('Conta eliminada com sucesso.');
+      showToast('Conta eliminada com sucesso.', 'success');
     } catch (e) {
-      alert('Erro ao eliminar conta: ' + e.message);
+      showToast('Erro ao eliminar conta: ' + e.message, 'error');
     }
   };
 
@@ -1784,11 +2030,14 @@
     const { data } = await supa.from('users').select('*').eq('id', currentUser.id).single();
     currentUserData = data || {};
     renderStats();
+    renderHeader();
     populateCategoryFilter();
     renderStickerGrid();
     loadMatches();
     renderProfile();
     checkPendingRequests();
+    loadCommunityStats();
+    loadRareStickers();
     const savedPage = localStorage.getItem('guimagym_page') || 'dashboard';
     showPage(savedPage);
   }
@@ -1812,6 +2061,98 @@
     document.getElementById('stat-tradeable').textContent = totalTradeable;
   }
 
+  function renderHeader() {
+    const avatarEl = document.getElementById('header-avatar');
+    const nameEl = document.getElementById('header-username');
+    const locationEl = document.getElementById('header-location');
+    const avatar = currentUserData.avatar;
+    if (avatar) {
+      avatarEl.innerHTML = '<img src="avatars/' + escapeHtml(avatar) + '.png" alt="Avatar">';
+    } else {
+      avatarEl.innerHTML = (currentUserData.username || '?')[0].toUpperCase();
+    }
+    nameEl.textContent = currentUserData.username || 'GuimaGym';
+    if (currentUserData.location) {
+      locationEl.textContent = currentUserData.location;
+      locationEl.style.display = '';
+    } else {
+      locationEl.style.display = 'none';
+    }
+  }
+
+  async function loadCommunityStats() {
+    try {
+      const { count: totalUsers } = await supa.from('users').select('id', { count: 'exact', head: true });
+      document.getElementById('stat-total-users').textContent = totalUsers || '-';
+
+      if (totalUsers && totalUsers > 0) {
+        const { count: totalOwnedStickers } = await supa.from('stickers').select('id', { count: 'exact', head: true }).gt('owned', 0);
+        const avgPct = ((totalOwnedStickers || 0) / (totalUsers * 788) * 100).toFixed(1);
+        document.getElementById('stat-avg-completion').textContent = avgPct + '%';
+      }
+    } catch (e) {
+      console.error('Failed to load community stats', e);
+    }
+  }
+
+  async function loadRareStickers() {
+    try {
+      const rareList = document.getElementById('rare-list');
+      rareList.innerHTML = '<div class="scanner-progress">A carregar...</div>';
+
+      // Fetch all stickers that are owned (one query)
+      const { data: ownedStickers } = await supa.from('stickers').select('sticker_id').gt('owned', 0);
+      
+      // Count ownership per sticker
+      const ownershipCounts = {};
+      (ownedStickers || []).forEach(s => {
+        ownershipCounts[s.sticker_id] = (ownershipCounts[s.sticker_id] || 0) + 1;
+      });
+
+      // Build results for all 788 stickers
+      const results = [];
+      for (let i = 1; i <= 788; i++) {
+        const id = String(i).padStart(3, '0');
+        results.push({ id, count: ownershipCounts[id] || 0 });
+      }
+
+      // Sort by count ascending, take top 10
+      results.sort((a, b) => a.count - b.count);
+
+      // Show up to 9, then a "+N" if there are ties at position 10
+      const DISPLAY_MAX = 9;
+      let rarest;
+      if (results.length <= DISPLAY_MAX) {
+        rarest = results;
+      } else {
+        rarest = results.slice(0, DISPLAY_MAX);
+        const cutoffCount = results[DISPLAY_MAX].count;
+        const tiedCount = results.filter(r => r.count === cutoffCount).length;
+        if (tiedCount > 1) {
+          rarest.push({ id: '+' + tiedCount, count: cutoffCount, isOverflow: true });
+        } else {
+          rarest.push(results[DISPLAY_MAX]);
+        }
+      }
+
+      rareList.innerHTML = rarest.map(r => {
+        if (r.isOverflow) {
+          return '<div class="rare-item" style="background:var(--bg-elevated);border-style:dashed">' +
+            '<div class="rare-id" style="color:var(--text-muted)">+' + r.id.replace('+', '') + '</div>' +
+            '<div class="rare-count">mais</div>' +
+            '</div>';
+        }
+        return '<div class="rare-item">' +
+          '<div class="rare-id">#' + r.id + '</div>' +
+          '<div class="rare-count">' + r.count + ' dono' + (r.count !== 1 ? 's' : '') + '</div>' +
+          '</div>';
+      }).join('');
+    } catch (e) {
+      console.error('Failed to load rare stickers', e);
+      document.getElementById('rare-list').innerHTML = '<div class="empty-state"><p>Nao foi possivel carregar.</p></div>';
+    }
+  }
+
   // Sticker categories
   const CATEGORIES = [
     { name: 'Baby Gym', start: 1, end: 14 },
@@ -1822,7 +2163,7 @@
     { name: 'Acrobatica', start: 448, end: 533 },
     { name: 'Aerobica', start: 534, end: 589 },
     { name: 'Trampolins', start: 590, end: 629 },
-    { name: ' Ritmica', start: 630, end: 656 },
+    { name: 'Ritmica', start: 630, end: 656 },
     { name: 'GPT', start: 657, end: 672 },
     { name: 'Hip-Hop', start: 673, end: 746 },
     { name: 'Parkour', start: 747, end: 759 },
@@ -1855,7 +2196,7 @@
         if (s.tradeable > 0) cls = 'tradeable';
         else if (s.owned > 0) cls = 'owned';
         const count = s.owned > 0 ? '<span class="count">x' + s.owned + '</span>' : '';
-        flatGrid.innerHTML += '<div class="sticker-cell ' + cls + '" onclick="handleStickerClick(\'' + id + '\')" tabindex="0" role="button" aria-label="Figurinha ' + id + '">' + id + count + '</div>';
+        flatGrid.innerHTML += '<div class="sticker-cell ' + cls + '" onclick="handleStickerClick(\'' + id + '\', this)" tabindex="0" role="button" aria-label="Figurinha ' + id + '">' + id + count + '</div>';
       }
       return;
     }
@@ -1886,7 +2227,7 @@
       card.className = 'category-card' + (openCats.has(cat.name) ? ' open' : '');
       card.dataset.cat = cat.name;
       card.innerHTML = `
-        <div class="category-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="category-header" onclick="this.parentElement.classList.toggle('open')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.parentElement.classList.toggle('open')}">
           <div class="cat-info">
             <span class="cat-name">${escapeHtml(cat.name)}</span>
             <span class="cat-range">#${startId} — #${endId}</span>
@@ -1909,7 +2250,7 @@
         if (s.tradeable > 0) cls = 'tradeable';
         else if (s.owned > 0) cls = 'owned';
         const count = s.owned > 0 ? '<span class="count">x' + s.owned + '</span>' : '';
-        grid.innerHTML += '<div class="sticker-cell ' + cls + '" onclick="handleStickerClick(\'' + id + '\')" tabindex="0" role="button" aria-label="Figurinha ' + id + '">' + id + count + '</div>';
+        grid.innerHTML += '<div class="sticker-cell ' + cls + '" onclick="handleStickerClick(\'' + id + '\', this)" tabindex="0" role="button" aria-label="Figurinha ' + id + '">' + id + count + '</div>';
       }
       listEl.appendChild(card);
     });
@@ -1937,11 +2278,13 @@
     document.getElementById('modal-tradeable').value = s.owned > 0 ? s.tradeable : 0;
     toggleTradeField();
     document.getElementById('sticker-modal').classList.remove('hidden');
+    trapFocus(document.getElementById('sticker-modal'));
   };
 
   window.closeModal = () => {
     document.getElementById('sticker-modal').classList.add('hidden');
     currentModalSticker = null;
+    releaseFocus();
   };
 
   window.toggleTradeField = () => {
@@ -1994,7 +2337,7 @@
     const badge = document.getElementById('match-count');
 
     if (userTradeable.length === 0) {
-      document.getElementById('matches-list').innerHTML = '<div class="empty-state"><div class="icon">&#128269;</div><p>Adicione figurinhas duplicadas para encontrar trocas!</p></div>';
+      document.getElementById('matches-list').innerHTML = '<div class="empty-state"><div class="icon">&#128269;</div><p>Adicione figurinhas duplicadas para encontrar trocas!</p><button class="btn btn-primary btn-full" style="margin-top:var(--space-md);max-width:200px" onclick="showPage(\'collection\')">Ir para Colecao</button></div>';
       badge.classList.add('hidden');
       cachedMatches = [];
       lastMatchStickerHash = hash;
@@ -2002,24 +2345,20 @@
     }
 
     // Get all other users
-    const { data: otherUsers } = await supa.from('users').select('id, username').neq('id', currentUser.id);
+    const { data: otherUsers } = await supa.from('users').select('id, username, location').neq('id', currentUser.id);
     const matches = [];
 
     for (const other of (otherUsers || [])) {
-      // Get other user's stickers with owned > 0
-      const { data: otherStickers } = await supa.from('stickers').select('sticker_id, owned, tradeable').eq('user_id', other.id).gt('owned', 0);
-      if (!otherStickers || otherStickers.length === 0) continue;
+      const { data: otherStickers } = await supa.from('stickers').select('sticker_id, owned, tradeable').eq('user_id', other.id);
+      if (!otherStickers) continue;
 
-      const otherNeeds = [], otherTradeable = [];
-      otherStickers.forEach(st => {
-        if (st.owned === 0) otherNeeds.push(st.sticker_id);
-        if (st.tradeable > 0) otherTradeable.push(st.sticker_id);
-      });
+      const otherOwned = new Set(otherStickers.filter(st => st.owned > 0).map(st => st.sticker_id));
+      const otherTradeable = otherStickers.filter(st => st.tradeable > 0).map(st => st.sticker_id);
 
-      const canGive = userTradeable.filter(s => otherNeeds.includes(s));
+      const canGive = userTradeable.filter(s => !otherOwned.has(s));
       const canGet = otherTradeable.filter(s => userNeeds.includes(s));
       if (canGive.length > 0 && canGet.length > 0) {
-        matches.push({ userId: other.id, username: other.username, canGive, canGet, score: canGive.length + canGet.length });
+        matches.push({ userId: other.id, username: other.username, location: other.location, canGive, canGet, score: canGive.length + canGet.length });
       }
     }
 
@@ -2032,7 +2371,7 @@
   function renderMatchCards(matches) {
     const badge = document.getElementById('match-count');
     if (matches.length === 0) {
-      document.getElementById('matches-list').innerHTML = '<div class="empty-state"><div class="icon">&#128269;</div><p>Nenhum match encontrado ainda.</p></div>';
+      document.getElementById('matches-list').innerHTML = '<div class="empty-state"><div class="icon">&#128269;</div><p>Nenhum match encontrado ainda.</p><p style="font-size:12px;color:var(--text-muted);margin-top:var(--space-sm)">Tente adicionar mais figurinhas a sua colecao.</p></div>';
       badge.classList.add('hidden');
       return;
     }
@@ -2047,8 +2386,9 @@
       const giveHtml = m.canGive.slice(0, 5).map(s => '<span>' + escapeHtml(s) + '</span>').join('') + (m.canGive.length > 5 ? '<span>+' + (m.canGive.length - 5) + '</span>' : '');
       const getHtml = m.canGet.slice(0, 5).map(s => '<span>' + escapeHtml(s) + '</span>').join('') + (m.canGet.length > 5 ? '<span>+' + (m.canGet.length - 5) + '</span>' : '');
       const safeName = escapeHtml(m.username);
+      const locationHtml = m.location ? '<div class="match-location">&#128205; ' + escapeHtml(m.location) + '</div>' : '';
       return '<div class="match-card">' +
-        '<div class="match-header"><span class="match-username">' + safeName + '</span><span class="match-score">' + m.score + ' matches</span></div>' +
+        '<div class="match-header"><span class="match-username">' + safeName + locationHtml + '</span><span class="match-score">' + m.score + ' matches</span></div>' +
         '<div class="match-details">' +
         '<div class="col"><div class="col-label">Pode dar</div><div class="match-stickers">' + giveHtml + '</div></div>' +
         '<div class="col"><div class="col-label">Pode receber</div><div class="match-stickers">' + getHtml + '</div></div>' +
@@ -2080,11 +2420,13 @@
       '<strong>Pode receber:</strong> #' + m.canGet.join(', #');
     document.getElementById('trade-req-message').value = '';
     document.getElementById('trade-request-modal').classList.remove('hidden');
+    trapFocus(document.getElementById('trade-request-modal'));
   };
 
   window.closeTradeRequestModal = () => {
     document.getElementById('trade-request-modal').classList.add('hidden');
     pendingTradeReq = null;
+    releaseFocus();
   };
 
   window.confirmTradeRequest = async () => {
@@ -2104,9 +2446,9 @@
       });
       if (error) throw error;
       closeTradeRequestModal();
-      alert('Pedido enviado!');
+      showToast('Pedido enviado!', 'success');
     } catch (e) {
-      alert('Erro ao enviar pedido. Tente novamente.');
+      showToast('Erro ao enviar pedido. Tente novamente.', 'error');
     }
   };
 
@@ -2152,7 +2494,7 @@
 
     // Render active incoming
     if (incActive.length === 0) {
-      incList.innerHTML = '<div class="empty-state"><div class="icon">&#128229;</div><p>Nenhum pedido recebido</p></div>';
+      incList.innerHTML = '<div class="empty-state"><div class="icon">&#128229;</div><p>Nenhum pedido recebido</p><button class="btn btn-primary btn-full" style="margin-top:var(--space-md);max-width:200px" onclick="showPage(\'dashboard\')">Ver Matches</button></div>';
     } else {
       incList.innerHTML = incActive.map(r => {
         const time = timeAgo(r.created_at || r.createdAt);
@@ -2189,7 +2531,7 @@
 
     // Render active outgoing
     if (outActive.length === 0) {
-      outList.innerHTML = '<div class="empty-state"><div class="icon">&#128228;</div><p>Nenhum pedido enviado</p></div>';
+      outList.innerHTML = '<div class="empty-state"><div class="icon">&#128228;</div><p>Nenhum pedido enviado</p><button class="btn btn-primary btn-full" style="margin-top:var(--space-md);max-width:200px" onclick="showPage(\'dashboard\')">Ver Matches</button></div>';
     } else {
       outList.innerHTML = outActive.map(r => {
         const time = timeAgo(r.created_at || r.createdAt);
@@ -2228,6 +2570,7 @@
       historySection.style.display = 'none';
     } else {
       historySection.style.display = '';
+      historyEl.classList.remove('hidden');
       historyEl.innerHTML = allHistory.map(r => {
         const isIncoming = (r.to_user_id || r.toUserId) === currentUser.id;
         const otherName = isIncoming ? (r.from_username || r.fromUserName) : (r.to_username || r.toUserName);
@@ -2252,7 +2595,7 @@
       if (error) throw error;
       loadTradeRequests();
     } catch (e) {
-      alert('Erro ao aceitar pedido.');
+      showToast('Erro ao aceitar pedido.', 'error');
     }
   };
 
@@ -2263,7 +2606,7 @@
       if (error) throw error;
       loadTradeRequests();
     } catch (e) {
-      alert('Erro ao concluir troca.');
+      showToast('Erro ao concluir troca.', 'error');
     }
   };
 
@@ -2271,11 +2614,13 @@
     pendingDeclineId = requestId;
     document.getElementById('decline-message').value = '';
     document.getElementById('decline-modal').classList.remove('hidden');
+    trapFocus(document.getElementById('decline-modal'));
   };
 
   window.closeDeclineModal = () => {
     document.getElementById('decline-modal').classList.add('hidden');
     pendingDeclineId = null;
+    releaseFocus();
   };
 
   window.confirmDecline = async () => {
@@ -2287,7 +2632,7 @@
       closeDeclineModal();
       loadTradeRequests();
     } catch (e) {
-      alert('Erro ao recusar pedido.');
+      showToast('Erro ao recusar pedido.', 'error');
     }
   };
 
@@ -2296,10 +2641,13 @@
     try {
       const { count } = await supa.from('trade_requests').select('id', { count: 'exact', head: true }).eq('to_user_id', currentUser.id).eq('status', 'pending');
       const dot = document.getElementById('notif-dot');
+      const sr = document.getElementById('notif-sr');
       if (count > 0) {
         dot.classList.add('show');
+        sr.textContent = count + ' pedido' + (count > 1 ? 's' : '') + ' pendente' + (count > 1 ? 's' : '');
       } else {
         dot.classList.remove('show');
+        sr.textContent = '';
       }
     } catch (e) { /* ignore */ }
   }
@@ -2315,6 +2663,46 @@
     })
     .subscribe();
 
+  // ============ TOAST NOTIFICATIONS ============
+  function showToast(message, type = 'info') {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    toast.textContent = message;
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:var(--radius-md);font-size:14px;font-weight:500;z-index:300;animation:fadeInUp 0.3s ease;max-width:calc(100vw - 32px);text-align:center;';
+    if (type === 'success') {
+      toast.style.background = 'var(--accent)';
+      toast.style.color = 'var(--bg-deep)';
+    } else if (type === 'error') {
+      toast.style.background = '#FF5252';
+      toast.style.color = '#fff';
+    } else {
+      toast.style.background = 'var(--bg-elevated)';
+      toast.style.color = 'var(--text-primary)';
+      toast.style.border = '1px solid var(--border)';
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s ease'; }, 2500);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  // ============ FOCUS TRAP ============
+  let lastFocusedElement = null;
+
+  function trapFocus(modalEl) {
+    lastFocusedElement = document.activeElement;
+    const focusable = modalEl.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length) focusable[0].focus();
+  }
+
+  function releaseFocus() {
+    if (lastFocusedElement) {
+      lastFocusedElement.focus();
+      lastFocusedElement = null;
+    }
+  }
+
   // ============ QUICK ENTRY TOOLS ============
   let quickMarkMode = false;
   let importMode = 'have'; // 'have' or 'missing'
@@ -2326,15 +2714,15 @@
     btn.innerHTML = quickMarkMode ? '&#9889; Modo Rapido (ativo)' : '&#9889; Modo Rapido';
   };
 
-  window.handleStickerClick = (id) => {
+  window.handleStickerClick = (id, el) => {
     if (quickMarkMode) {
-      cycleStickerState(id);
+      cycleStickerState(id, el);
     } else {
       openModal(id);
     }
   };
 
-  async function cycleStickerState(id) {
+  async function cycleStickerState(id, el) {
     const s = userStickers[id] || { owned: 0, tradeable: 0 };
     let newOwned, newTradeable;
     if (s.owned === 0) {
@@ -2344,26 +2732,25 @@
     } else {
       newOwned = 0; newTradeable = 0;
     }
-    await supa.from('stickers').upsert({ user_id: currentUser.id, sticker_id: id, owned: newOwned, tradeable: newTradeable }, { onConflict: 'user_id,sticker_id' });
     userStickers[id] = { sticker_id: id, owned: newOwned, tradeable: newTradeable };
     cachedMatches = null;
 
-    // Update cell visually
-    const cells = document.querySelectorAll('.sticker-cell');
-    for (const cell of cells) {
-      if (cell.textContent.includes(id)) {
-        cell.className = 'sticker-cell ' + (newTradeable > 0 ? 'tradeable' : newOwned > 0 ? 'owned' : 'missing');
-        const countEl = cell.querySelector('.count');
-        if (countEl) countEl.remove();
-        if (newOwned > 0) {
-          cell.insertAdjacentHTML('beforeend', '<span class="count">x' + newOwned + '</span>');
-        }
-        cell.classList.add(newOwned > 0 ? 'flash-owned' : 'flash-tradeable');
-        setTimeout(() => cell.classList.remove('flash-owned', 'flash-tradeable'), 400);
-        break;
+    if (el) {
+      const cls = newTradeable > 0 ? 'tradeable' : newOwned > 0 ? 'owned' : 'missing';
+      el.className = 'sticker-cell ' + cls;
+      const countEl = el.querySelector('.count');
+      if (countEl) countEl.remove();
+      if (newOwned > 0) {
+        el.insertAdjacentHTML('beforeend', '<span class="count">x' + newOwned + '</span>');
       }
     }
+
     renderStats();
+    try {
+      await supa.from('stickers').upsert({ user_id: currentUser.id, sticker_id: id, owned: newOwned, tradeable: newTradeable }, { onConflict: 'user_id,sticker_id' });
+    } catch (e) {
+      console.error('upsert failed', e);
+    }
   }
 
   // Range/list parser: "001-100, 150, 200-300, 445" → array of IDs
@@ -2412,7 +2799,7 @@
   window.executeImport = async () => {
     const input = document.getElementById('import-input').value;
     const ids = parseStickerList(input);
-    if (ids.length === 0) return alert('Introduza pelo menos um numero de figurinha.');
+    if (ids.length === 0) return showToast('Introduza pelo menos um numero de figurinha.', 'error');
 
     let toMarkOwned;
     if (importMode === 'have') {
@@ -2435,7 +2822,7 @@
     document.getElementById('import-preview').innerHTML = '';
     renderStats();
     renderStickerGrid();
-    alert('Importacao concluida! ' + toMarkOwned.length + ' figurinhas marcadas.');
+    showToast('Importacao concluida! ' + toMarkOwned.length + ' figurinhas marcadas.', 'success');
   };
 
   async function markStickersAsOwned(ids) {
@@ -2497,10 +2884,13 @@
 
   function renderAvatarGrid() {
     const grid = document.getElementById('avatar-grid');
+    grid.setAttribute('role', 'radiogroup');
+    grid.setAttribute('aria-label', 'Escolher avatar');
     const selected = currentUserData.avatar || '';
     grid.innerHTML = AVATARS.map(name => {
       const isSelected = selected === name ? ' selected' : '';
-      return '<div class="avatar-option' + isSelected + '" onclick="selectAvatar(\'' + name + '\')" title="' + name + '">' +
+      const checked = selected === name ? 'true' : 'false';
+      return '<div class="avatar-option' + isSelected + '" onclick="selectAvatar(\'' + name + '\')" tabindex="0" role="radio" aria-checked="' + checked + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();selectAvatar(\'' + name + '\')}" title="' + name + '">' +
         '<img src="avatars/' + name + '.png" alt="Avatar ' + name + '" loading="lazy">' +
         '</div>';
     }).join('');
@@ -2513,7 +2903,7 @@
       renderProfile();
       renderAvatarGrid();
     } catch (e) {
-      alert('Erro ao guardar avatar.');
+      showToast('Erro ao guardar avatar.', 'error');
     }
   };
 
@@ -2531,17 +2921,153 @@
     document.getElementById('profile-name').textContent = currentUserData.username || 'Utilizador';
     document.getElementById('profile-email').textContent = currentUserData.email || user.email;
 
-    let uniqueOwned = 0, totalOwned = 0, totalTradeable = 0;
-    Object.values(userStickers).forEach(s => {
-      if (s.owned > 0) { uniqueOwned++; totalOwned += s.owned; }
-      if (s.tradeable > 0) totalTradeable += s.tradeable;
-    });
-    document.getElementById('profile-unique').textContent = uniqueOwned;
-    document.getElementById('profile-total').textContent = totalOwned;
-    document.getElementById('profile-tradeable').textContent = totalTradeable;
+    const locationSelect = document.getElementById('profile-location');
+    locationSelect.value = currentUserData.location || 'Academia';
 
     renderAvatarGrid();
   }
+
+  window.updateLocation = async () => {
+    const location = document.getElementById('profile-location').value;
+    try {
+      await supa.from('users').update({ location }).eq('id', currentUser.id);
+      currentUserData.location = location;
+      renderHeader();
+    } catch (e) {
+      showToast('Erro ao guardar localizacao.', 'error');
+    }
+  };
+
+  // ============ SCANNER ============
+  window.openScanner = () => {
+    document.getElementById('scanner-content').innerHTML =
+      '<div style="text-align:center">' +
+      '<div class="scanner-progress">A abrir camara...</div>' +
+      '<button class="btn-fallback btn-full" onclick="document.getElementById(\'scanner-file-input\').value=\'\';document.getElementById(\'scanner-file-input\').click()" style="margin-top:var(--space-md)">Ou escolher foto da galeria</button>' +
+      '</div>';
+    document.getElementById('scanner-modal').classList.remove('hidden');
+    trapFocus(document.getElementById('scanner-modal'));
+    document.getElementById('scanner-file-input').click();
+  };
+
+  window.closeScannerModal = () => {
+    document.getElementById('scanner-modal').classList.add('hidden');
+    releaseFocus();
+  };
+
+  window.handleScannerFile = async (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      closeScannerModal();
+      return;
+    }
+
+    const content = document.getElementById('scanner-content');
+    content.innerHTML = '<div class="scanner-progress">A analisar imagem...</div>';
+
+    try {
+      const result = await Tesseract.recognize(file, 'eng', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            content.innerHTML = '<div class="scanner-progress">A ler... ' + Math.round(m.progress * 100) + '%</div>';
+          }
+        }
+      });
+
+      const text = result.data.text;
+      // Find 3-digit numbers in the OCR text
+      const matches = text.match(/\b\d{3}\b/g);
+      let foundNumber = null;
+
+      if (matches && matches.length > 0) {
+        // Find the first number between 001 and 788
+        for (const m of matches) {
+          const num = parseInt(m, 10);
+          if (num >= 1 && num <= 788) {
+            foundNumber = m.padStart(3, '0');
+            break;
+          }
+        }
+      }
+
+      if (foundNumber) {
+        const s = userStickers[foundNumber] || { owned: 0, tradeable: 0 };
+        const alreadyOwned = s.owned > 0;
+        let actionsHtml = '';
+
+        if (!alreadyOwned) {
+          actionsHtml = '<button class="btn-add" onclick="scannerAddSticker(\'' + foundNumber + '\', \'add\')">Adicionar a colecao</button>' +
+            '<button class="btn-dup" onclick="scannerAddSticker(\'' + foundNumber + '\', \'dup\')">Marcar como duplicada</button>';
+        } else if (s.tradeable > 0) {
+          actionsHtml = '<div style="color:var(--gold);font-size:14px;font-weight:600">Ja e duplicada</div>';
+        } else {
+          actionsHtml = '<button class="btn-dup" onclick="scannerAddSticker(\'' + foundNumber + '\', \'dup\')">Marcar como duplicada</button>';
+        }
+
+        content.innerHTML = '<div style="font-size:13px;color:var(--text-secondary)">Figurinha encontrada!</div>' +
+          '<div class="found-number">#' + foundNumber + '</div>' +
+          '<div class="scanner-actions">' + actionsHtml + '</div>';
+      } else {
+        content.innerHTML = '<div style="font-size:14px;color:var(--text-secondary);margin-bottom:var(--space-md)">Nao consegui ler o numero.</div>' +
+          '<input type="text" id="scanner-manual-input" class="search-bar" placeholder="Escreva o numero (ex: 042)" style="margin-bottom:var(--space-md)">' +
+          '<button class="btn-add btn-full" onclick="scannerManualSubmit()">Submeter</button>';
+      }
+    } catch (e) {
+      content.innerHTML = '<div style="font-size:14px;color:#FF5252">Erro ao processar imagem. Tente novamente.</div>' +
+        '<button class="btn-fallback btn-full" onclick="openScanner()" style="margin-top:var(--space-md)">Tentar novamente</button>';
+    }
+
+    // Reset file input
+    event.target.value = '';
+  };
+
+  window.scannerManualSubmit = () => {
+    const input = document.getElementById('scanner-manual-input');
+    if (!input) return;
+    const val = input.value.trim();
+    const num = parseInt(val, 10);
+    if (num >= 1 && num <= 788) {
+      const id = num.toString().padStart(3, '0');
+      const s = userStickers[id] || { owned: 0, tradeable: 0 };
+      const alreadyOwned = s.owned > 0;
+      const content = document.getElementById('scanner-content');
+
+      if (!alreadyOwned) {
+        content.innerHTML = '<div style="font-size:13px;color:var(--text-secondary)">Figurinha encontrada!</div>' +
+          '<div class="found-number">#' + id + '</div>' +
+          '<div class="scanner-actions">' +
+          '<button class="btn-add" onclick="scannerAddSticker(\'' + id + '\', \'add\')">Adicionar a colecao</button>' +
+          '<button class="btn-dup" onclick="scannerAddSticker(\'' + id + '\', \'dup\')">Marcar como duplicada</button>' +
+          '</div>';
+      } else if (s.tradeable > 0) {
+        content.innerHTML = '<div style="font-size:13px;color:var(--text-secondary)">Figurinha encontrada!</div>' +
+          '<div class="found-number">#' + id + '</div>' +
+          '<div style="color:var(--gold);font-size:14px;font-weight:600">Ja e duplicada</div>';
+      } else {
+        content.innerHTML = '<div style="font-size:13px;color:var(--text-secondary)">Figurinha encontrada!</div>' +
+          '<div class="found-number">#' + id + '</div>' +
+          '<div class="scanner-actions">' +
+          '<button class="btn-dup" onclick="scannerAddSticker(\'' + id + '\', \'dup\')">Marcar como duplicada</button>' +
+          '</div>';
+      }
+    } else {
+      showToast('Introduza um numero valido entre 001 e 788.', 'error');
+    }
+  };
+
+  window.scannerAddSticker = async (id, action) => {
+    let owned = 1, tradeable = 0;
+    if (action === 'dup') {
+      owned = 1;
+      tradeable = 1;
+    }
+    await supa.from('stickers').upsert({ user_id: currentUser.id, sticker_id: id, owned, tradeable }, { onConflict: 'user_id,sticker_id' });
+    userStickers[id] = { sticker_id: id, owned, tradeable };
+    cachedMatches = null;
+    renderStats();
+    renderStickerGrid();
+    closeScannerModal();
+  };
 
   // Navigation
   const TAB_PAGES = ['dashboard', 'collection', 'pedidos', 'profile'];
@@ -2556,7 +3082,9 @@
     if (el) el.classList.remove('hidden');
 
     document.querySelectorAll('.tab-bar button').forEach((btn, i) => {
-      btn.classList.toggle('active', TAB_PAGES[i] === page);
+      const isActive = TAB_PAGES[i] === page;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
     if (page === 'pedidos') loadTradeRequests();
@@ -2571,6 +3099,24 @@
       closeModal();
       closeTradeRequestModal();
       closeDeclineModal();
+      closeScannerModal();
+    }
+    // Focus trap for modals
+    if (e.key === 'Tab') {
+      const openModal = document.querySelector('.modal-overlay:not(.hidden)');
+      if (openModal) {
+        const focusable = openModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     }
   });
 </script>
