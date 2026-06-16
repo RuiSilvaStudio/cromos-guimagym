@@ -9,7 +9,6 @@
   <title>GuimaGym - Caderneta de Stickers 2026</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1889,6 +1888,10 @@
     <div id="scanner-content">
       <div class="scanner-progress">A abrir camara...</div>
     </div>
+    <div id="scanner-usage" style="font-size:11px;color:var(--text-secondary);text-align:center;margin-top:var(--space-sm);display:none"></div>
+    <div id="scanner-privacy" style="font-size:11px;color:var(--text-secondary);text-align:center;margin-top:6px;padding:8px;background:var(--bg-elevated);border-radius:var(--radius-sm)">
+      A imagem e analisada por IA e <strong>nao e armazenada</strong>. Limite: 100 escaneamentos/mes.
+    </div>
     <div class="btn-row">
       <button class="btn btn-cancel" onclick="closeScannerModal()">Cancelar</button>
     </div>
@@ -2939,7 +2942,7 @@
   };
 
   // ============ SCANNER ============
-  window.openScanner = () => {
+  window.openScanner = async () => {
     document.getElementById('scanner-content').innerHTML =
       '<div style="text-align:center">' +
       '<div class="scanner-progress">A abrir camara...</div>' +
@@ -2947,11 +2950,24 @@
       '</div>';
     document.getElementById('scanner-modal').classList.remove('hidden');
     trapFocus(document.getElementById('scanner-modal'));
+
+    // Fetch and display usage
+    try {
+      const now = new Date();
+      const month = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const { data } = await supa.from('scan_usage').select('count').eq('user_id', currentUser.id).eq('month', month).single();
+      const used = data?.count ?? 0;
+      const usageEl = document.getElementById('scanner-usage');
+      usageEl.style.display = 'block';
+      usageEl.textContent = used + ' de 100 escaneamentos este mes';
+    } catch (e) { /* ignore */ }
+
     document.getElementById('scanner-file-input').click();
   };
 
   window.closeScannerModal = () => {
     document.getElementById('scanner-modal').classList.add('hidden');
+    document.getElementById('scanner-usage').style.display = 'none';
     releaseFocus();
   };
 
@@ -2963,34 +2979,65 @@
     }
 
     const content = document.getElementById('scanner-content');
-    content.innerHTML = '<div class="scanner-progress">A analisar imagem...</div>';
+    content.innerHTML = '<div class="scanner-progress">A analisar imagem com IA...</div>';
 
     try {
-      const result = await Tesseract.recognize(file, 'eng', {
-        logger: m => {
-          if (m.status === 'recognizing text') {
-            content.innerHTML = '<div class="scanner-progress">A ler... ' + Math.round(m.progress * 100) + '%</div>';
-          }
-        }
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            // Resize to max 1024px on longest side
+            const MAX = 1024;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+              if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+              else { w = Math.round(w * MAX / h); h = MAX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            resolve(dataUrl.split(',')[1]);
+          };
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
 
-      const text = result.data.text;
-      // Find 3-digit numbers in the OCR text
-      const matches = text.match(/\b\d{3}\b/g);
-      let foundNumber = null;
+      content.innerHTML = '<div class="scanner-progress">A enviar para IA...</div>';
 
-      if (matches && matches.length > 0) {
-        // Find the first number between 001 and 788
-        for (const m of matches) {
-          const num = parseInt(m, 10);
-          if (num >= 1 && num <= 788) {
-            foundNumber = m.padStart(3, '0');
-            break;
-          }
-        }
+      // Call Supabase Edge Function
+      const { data: { session } } = await supa.auth.getSession();
+      const res = await fetch(SUPABASE_URL + '/functions/v1/scan-sticker', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+          'apikey': SUPABASE_KEY,
+        },
+        body: JSON.stringify({ image: base64 }),
+      });
+
+      const data = await res.json();
+
+      // Update usage display
+      if (data.used !== undefined) {
+        const usageEl = document.getElementById('scanner-usage');
+        usageEl.style.display = 'block';
+        usageEl.textContent = data.used + ' de 100 escaneamentos este mes';
       }
 
-      if (foundNumber) {
+      if (data.error === 'monthly_limit') {
+        content.innerHTML = '<div style="font-size:14px;color:var(--gold);font-weight:600;margin-bottom:var(--space-md)">' + data.message + '</div>' +
+          '<div style="font-size:13px;color:var(--text-secondary)">Pode tentar novamente no proximo mes ou escreva o numero manualmente.</div>' +
+          '<input type="text" id="scanner-manual-input" class="search-bar" placeholder="Escreva o numero (ex: 042)" style="margin:var(--space-md) 0">' +
+          '<button class="btn-add btn-full" onclick="scannerManualSubmit()">Submeter</button>';
+      } else if (data.number) {
+        const foundNumber = data.number;
         const s = userStickers[foundNumber] || { owned: 0, tradeable: 0 };
         const alreadyOwned = s.owned > 0;
         let actionsHtml = '';
@@ -3013,6 +3060,7 @@
           '<button class="btn-add btn-full" onclick="scannerManualSubmit()">Submeter</button>';
       }
     } catch (e) {
+      console.error('Scanner error:', e);
       content.innerHTML = '<div style="font-size:14px;color:#FF5252">Erro ao processar imagem. Tente novamente.</div>' +
         '<button class="btn-fallback btn-full" onclick="openScanner()" style="margin-top:var(--space-md)">Tentar novamente</button>';
     }
